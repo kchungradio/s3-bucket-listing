@@ -65,7 +65,7 @@ function getS3Data(marker, html) {
   var s3_rest_url = createS3QueryUrl(marker);
   // set loading notice
   $('#listing')
-      .html('<img src="//assets.okfn.org/images/icons/ajaxload-circle.gif" />');
+      .html('Loading (this should take about 30 seconds)');
   $.get(s3_rest_url)
       .done(function(data) {
         // clear loading notice
@@ -163,9 +163,9 @@ function getInfoFromS3Data(xml) {
     item = $(item);
     // clang-format off
     return {
-      Key: item.find('Key').text(),
-          LastModified: item.find('LastModified').text(),
-          Size: bytesToHumanReadable(item.find('Size').text()),
+          Key: item.find('Key').text(),
+//        LastModified: item.find('LastModified').text(),
+//        Size: bytesToHumanReadable(item.find('Size').text()),
           Type: 'file'
     }
     // clang-format on
@@ -174,10 +174,10 @@ function getInfoFromS3Data(xml) {
     item = $(item);
     // clang-format off
     return {
-      Key: item.find('Prefix').text(),
-        LastModified: '',
-        Size: '0',
-        Type: 'directory'
+          Key: item.find('Prefix').text(),
+          LastModified: item.find('LastModified').text(),
+//        Size: '0',
+          Type: 'directory'
     }
     // clang-format on
   });
@@ -206,20 +206,18 @@ function prepareTable(info) {
   var files = info.directories.concat(info.files), prefix = info.prefix;
   var cols = [45, 30, 15];
   var content = [];
-  content.push(padRight('Last Modified', cols[1]) + '  ' +
-               padRight('Size', cols[2]) + 'Key \n');
-  content.push(new Array(cols[0] + cols[1] + cols[2] + 4).join('-') + '\n');
-
-  // add ../ at the start of the dir listing, unless we are already at root dir
+  content.push(padRight('', cols[2]) + '\n');
+  
+  // add a link back at the start of the dir listing, unless we are already at root dir
   if (prefix && prefix !== S3B_ROOT_DIR) {
     var up = prefix.replace(/\/$/, '').split('/').slice(0, -1).concat('').join(
             '/'),  // one directory up
         item =
             {
               Key: up,
-              LastModified: '',
-              Size: '',
-              keyText: '../',
+//            LastModified: '',
+//            Size: '',
+              keyText: '&larr; back' + '\n',
               href: S3BL_IGNORE_PATH ? '?prefix=' + up : '../'
             },
         row = renderRow(item, cols);
@@ -249,11 +247,11 @@ function prepareTable(info) {
 }
 
 function renderRow(item, cols) {
-  var row = '';
-  row += padRight(item.LastModified, cols[1]) + '  ';
-  row += padRight(item.Size, cols[2]);
-  row += '<a href="' + item.href + '">' + item.keyText + '</a>';
-  return row;
+     var row = '';
+//   row += padRight(item.LastModified, cols[1]) + '  ';
+//   row += padRight(item.Size, cols[2]);
+     row += '<a href="' + item.href + '">' + item.keyText + '</a>';
+     return row;
 }
 
 function padRight(padString, length) {
